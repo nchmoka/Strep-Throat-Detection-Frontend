@@ -1,52 +1,81 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import { View, Text, TextInput, Button, Alert, StyleSheet } from "react-native";
 import { loginUser } from "../utils/api";
 
-export default function LoginScreen({ navigation }) {
+const LoginScreen = ({ navigation }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    async function handleLogin() {
-        console.log("1");
+    const handleLogin = async () => {
+        if (!username || !password) {
+            Alert.alert("Error", "Please enter both username and password.");
+            return;
+        }
+
         const response = await loginUser(username, password);
         if (response.message === "Login successful") {
-            navigation.replace("Home");
+            console.log(response.success);
+            Alert.alert("Success", "Login successful!");
+            navigation.replace("Main"); // Navigate to main screen
         } else {
-            alert(response.error || "Login failed");
+            Alert.alert("Error", response.error || "Login failed.");
         }
-    }
+    };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Login</Text>
+            <Text style={styles.header}>Login</Text>
             <TextInput
-                placeholder="Username"
-                onChangeText={setUsername}
                 style={styles.input}
+                placeholder="Username"
+                value={username}
+                onChangeText={setUsername}
             />
             <TextInput
-                placeholder="Password"
-                onChangeText={setPassword}
                 style={styles.input}
+                placeholder="Password"
                 secureTextEntry
+                value={password}
+                onChangeText={setPassword}
             />
             <Button title="Login" onPress={handleLogin} />
-            <Button
-                title="No account? Register"
-                onPress={() => navigation.navigate("Register")}
-            />
+            <Text
+                style={styles.switchText}
+                onPress={() => navigation.navigate("RegisterScreen")}
+            >
+                Don't have an account? Register
+            </Text>
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
-    container: { flex: 1, justifyContent: "center", padding: 20 },
-    title: { fontSize: 24, marginBottom: 20, textAlign: "center" },
+    container: {
+        flex: 1,
+        justifyContent: "center",
+        padding: 20,
+        backgroundColor: "#f8f9fa",
+    },
+    header: {
+        fontSize: 24,
+        fontWeight: "bold",
+        marginBottom: 20,
+        textAlign: "center",
+    },
     input: {
+        height: 50,
         borderWidth: 1,
         borderColor: "#ccc",
-        padding: 10,
-        marginBottom: 10,
-        borderRadius: 5,
+        borderRadius: 8,
+        marginBottom: 15,
+        paddingHorizontal: 10,
+        backgroundColor: "#fff",
+    },
+    switchText: {
+        marginTop: 15,
+        textAlign: "center",
+        color: "#007AFF",
     },
 });
+
+export default LoginScreen;

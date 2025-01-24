@@ -1,22 +1,78 @@
 import React from "react";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer } from "@react-navigation/native";
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import OnboardingScreen from "../screens/OnboardingScreen";
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
-import HomeScreen from "../screens/HomeScreen";
-import AnalyzeScreen from "../screens/AnalyzeScreen";
-import ResourcesScreen from "../screens/ResourcesScreen";
+import CaptureScreen from "../screens/CaptureScreen";
+import ResultScreen from "../screens/ResultScreen";
+import HistoryScreen from "../screens/HistoryScreen";
+import FAQScreen from "../screens/FAQScreen";
+import SettingsScreen from "../screens/SettingsScreen";
+import { Ionicons } from "@expo/vector-icons";
 
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
 
-export default function AppNavigator() {
+const MainTabs = () => {
     return (
-        <Stack.Navigator initialRouteName="Login">
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Analyze" component={AnalyzeScreen} />
-            <Stack.Screen name="Resources" component={ResourcesScreen} />
-        </Stack.Navigator>
+        <Tab.Navigator screenOptions={{ headerShown: false }}>
+            <Tab.Screen
+                name="Capture"
+                component={CaptureScreen}
+                options={{
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="camera" color={color} size={size} />
+                    ),
+                }}
+            />
+            <Tab.Screen
+                name="History"
+                component={HistoryScreen}
+                options={{
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="time" color={color} size={size} />
+                    ),
+                }}
+            />
+        </Tab.Navigator>
     );
-}
+};
+
+const DrawerNavigator = () => {
+    return (
+        <Drawer.Navigator>
+            <Drawer.Screen name="Home" component={MainTabs} />
+            <Drawer.Screen name="Results" component={ResultScreen} />
+            <Drawer.Screen name="FAQ" component={FAQScreen} />
+            <Drawer.Screen name="Settings" component={SettingsScreen} />
+        </Drawer.Navigator>
+    );
+};
+
+const AppNavigator = () => {
+    return (
+        <NavigationContainer>
+            <Stack.Navigator
+                initialRouteName="OnboardingScreen"
+                screenOptions={{ headerShown: false }}
+            >
+                <Stack.Screen
+                    name="OnboardingScreen"
+                    component={OnboardingScreen}
+                />
+                <Stack.Screen name="LoginScreen" component={LoginScreen} />
+                <Stack.Screen
+                    name="RegisterScreen"
+                    component={RegisterScreen}
+                />
+                <Stack.Screen name="Main" component={DrawerNavigator} />
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
+};
+
+export default AppNavigator;

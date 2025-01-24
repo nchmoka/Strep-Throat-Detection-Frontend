@@ -1,89 +1,88 @@
+import axios from "axios";
+
 const BASE_URL =
-    "https://362b-2a06-c701-74f0-4900-1b2-cb1b-6917-1f1f.ngrok-free.app";
+    "https://a337-2a06-c701-74df-e00-5495-e6f9-b7d5-a356.ngrok-free.app";
 
-// A small helper to handle common fetch logic
-async function handleResponse(response) {
-    const data = await response.json().catch(() => ({}));
-    console.log(data);
+// Function to upload image to the backend
+export const uploadImage = async (imageUri) => {
+    try {
+        const formData = new FormData();
+        formData.append("image", {
+            uri: imageUri,
+            name: "throat_image.jpg",
+            type: "image/jpeg",
+        });
 
-    if (!response.ok) {
-        // Response not OK: Try to return error from data or a default message
-        const error = data.error || "An error occurred. Please try again.";
-        throw new Error(error);
+        const response = await axios.post(`${BASE_URL}/analyze/`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+            withCredentials: true, // To include cookies in the request
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error uploading image:", error);
+        return { success: false, error: error.message };
     }
-    return data;
-}
+};
 
-/**
- * Register a new user.
- * @param {string} username
- * @param {string} password
- * @returns {Promise<object>} JSON response from server
- */
-export async function registerUser(username, password) {
-    const _body = `username=${username}&password=${password}`;
-    const response = await fetch(`${BASE_URL}/register/`, {
-        method: "POST",
-        body: _body,
-    }).catch((error) => {
-        console.log(error);
-    });
-    return handleResponse(response);
-}
+export const registerUser = async (username, password, navigation) => {
+    try {
+        const response = await axios.post(
+            `${BASE_URL}/register/`,
+            new URLSearchParams({
+                username,
+                password,
+            }),
+            {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            }
+        );
 
-/**
- * Login user with given credentials.
- * On success, a session cookie is set by the server.
- * @param {string} username
- * @param {string} password
- * @returns {Promise<object>} JSON response
- */
-export async function loginUser(username, password) {
-    const formData = new FormData();
-    formData.append("username", username);
-    formData.append("password", password);
-    console.log(formData);
-    const response = await fetch(`${BASE_URL}/login/`, {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-    });
+        if (response.status === 201) {
+            alert("Registration successful! Logging in...");
 
-    return handleResponse(response);
-}
+            // Auto-login after successful registration
+            const loginResponse = await loginUser(username, password);
 
-/**
- * Analyze throat image.
- * Requires the user to be authenticated (session cookie from login).
- * @param {string} uri Path to the image file
- * @returns {Promise<object>} JSON with prediction and probability
- */
-export async function analyzeImage(uri) {
-    const formData = new FormData();
-    formData.append("image", {
-        uri,
-        type: "image/jpeg",
-        name: "throat.jpg",
-    });
+            if (loginResponse.success) {
+                alert("Login successful!");
+                navigation.replace("HomeScreen"); // Redirect user to main app screen
+            } else {
+                alert("Login failed! Please log in manually.");
+                navigation.navigate("LoginScreen"); // Redirect to login screen
+            }
+        }
+        return response.data;
+    } catch (error) {
+        console.error("Error registering user:", error);
+        alert("Registration failed. Please try again.");
+        return { success: false, error: error.message };
+    }
+};
 
-    const response = await fetch(`${BASE_URL}/analyze/`, {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-    });
-
-    return handleResponse(response);
-}
-
-/**
- * Get a list of educational resources.
- * @returns {Promise<Array>} Array of resources (id, title, content, etc.)
- */
-export async function getResources() {
-    const response = await fetch(`${BASE_URL}/resources/`, {
-        method: "GET",
-        credentials: "include",
-    });
-
-    return handleResponse(response);
-}
+// Function to log in a user and store session cookies
+export const loginUser = async (username, password) => {
+    try {
+        const response = await axios.post(
+            `${BASE_URL}/login/`,
+            new URLSearchParams({
+                username,
+                password,
+            }),
+            {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                withCredentials: true, // To include session cookies
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Error logging in:", error);
+        return { success: false, error: error.message };
+    }
+};

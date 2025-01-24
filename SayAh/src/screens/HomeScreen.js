@@ -1,23 +1,25 @@
 import React from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
-export default function HomeScreen({ navigation }) {
+const HomeScreen = () => {
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Welcome!</Text>
-            <Button
-                title="Analyze Throat Image"
-                onPress={() => navigation.navigate("Analyze")}
-            />
-            <Button
-                title="View Educational Resources"
-                onPress={() => navigation.navigate("Resources")}
-            />
+            <Text style={styles.text}>Welcome to SayAh!</Text>
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
-    container: { flex: 1, justifyContent: "center", alignItems: "center" },
-    title: { fontSize: 24, marginBottom: 20 },
+    container: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#fff",
+    },
+    text: {
+        fontSize: 24,
+        fontWeight: "bold",
+    },
 });
+
+export default HomeScreen;
