@@ -1,17 +1,45 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
     View,
     Text,
     Button,
     StyleSheet,
     Animated,
-    ScrollView,
     Image,
+    ActivityIndicator,
 } from "react-native";
 import Swiper from "react-native-swiper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const OnboardingScreen = ({ navigation }) => {
+    const [loading, setLoading] = useState(true);
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        const checkOnboardingStatus = async () => {
+            try {
+                const hasSeenOnboarding = await AsyncStorage.getItem(
+                    "hasSeenOnboarding"
+                );
+                if (hasSeenOnboarding === "true") {
+                    navigation.replace("Auth"); // Skip onboarding if already seen
+                } else {
+                    setLoading(false);
+                    Animated.timing(fadeAnim, {
+                        toValue: 1,
+                        duration: 1000,
+                        useNativeDriver: true,
+                    }).start();
+                }
+            } catch (error) {
+                console.error("Error checking onboarding status:", error);
+                setLoading(false);
+            }
+        };
+
+        checkOnboardingStatus();
+    }, [navigation]);
+
     const finishOnboarding = async () => {
         try {
             await AsyncStorage.setItem("hasSeenOnboarding", "true");
@@ -21,21 +49,19 @@ const OnboardingScreen = ({ navigation }) => {
         }
     };
 
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-
-    useEffect(() => {
-        Animated.timing(fadeAnim, {
-            toValue: 1,
-            duration: 1000,
-            useNativeDriver: true,
-        }).start();
-    }, []);
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#007AFF" />
+            </View>
+        );
+    }
 
     return (
         <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
             <Swiper
                 loop={false}
-                showsPagination={true}
+                showsPagination
                 dotColor="#ccc"
                 activeDotColor="#007AFF"
             >
@@ -80,7 +106,7 @@ const OnboardingScreen = ({ navigation }) => {
                     </Text>
                     <Button
                         title="Get Started"
-                        onPress={() => finishOnboarding()}
+                        onPress={finishOnboarding}
                         color="#007AFF"
                     />
                 </View>
@@ -92,6 +118,12 @@ const OnboardingScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: "#FFFFFF",
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
         backgroundColor: "#FFFFFF",
     },
     slide: {
