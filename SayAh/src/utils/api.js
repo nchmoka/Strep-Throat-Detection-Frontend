@@ -82,39 +82,29 @@ export const loginUser = async (username, password) => {
         );
 
         if (response.status === 200) {
-            console.log("Login Headers:", response.headers); // Debug headers
-
             // Extract session ID from response headers
             const setCookieHeader = response.headers["set-cookie"];
             let sessionId = null;
 
             if (setCookieHeader && Array.isArray(setCookieHeader)) {
-                console.log("Set-Cookie Header:", setCookieHeader); // Debugging
-
                 // Join array into a single string, then split cookies by ", " (for multiple cookies)
                 const cookieString = setCookieHeader.join(", ");
-                console.log("Cookie String:", cookieString); // Debugging
 
                 // Find the sessionid in the cookie string
                 const sessionCookie = cookieString
                     .split(", ") // Split cookies in case of multiple
                     .find((cookie) => cookie.includes("sessionid="));
 
-                console.log("Session Cookie Found:", sessionCookie); // Debugging
-
                 if (sessionCookie) {
                     sessionId = sessionCookie.split(";")[0].split("=")[1]; // Extract session ID
-                    console.log("Extracted Session ID:", sessionId); // Debugging
                 }
             }
 
             if (!sessionId) {
-                console.error("Session ID not found in headers.");
                 return { success: false, error: "Session ID missing." };
             }
 
             await AsyncStorage.setItem("authToken", sessionId); // Store session ID
-            console.log("Stored session ID:", sessionId); // Debugging
 
             return { success: true, sessionId };
         }
