@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
     View,
@@ -8,54 +8,39 @@ import {
     Alert,
     ActivityIndicator,
     Text,
-    Modal,
 } from "react-native";
-import { Camera } from "expo-camera"; // ✅ Ensure this is imported correctly
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import { uploadImage } from "../utils/api";
 import { Ionicons } from "@expo/vector-icons";
 
 const CaptureScreen = ({ navigation }) => {
-    const [hasPermission, setHasPermission] = useState(null);
-    const [cameraOpen, setCameraOpen] = useState(false);
     const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(false);
-    const cameraRef = useRef(null);
 
-    // Request Camera Permissions on Component Mount
-    useEffect(() => {
-        (async () => {
-            const { status } = await Camera.requestCameraPermissionsAsync();
-            setHasPermission(status === "granted");
-        })();
-    }, []);
-
-    // Open Camera with Live Preview
-    const openCamera = () => {
-        if (!hasPermission) {
+    const openCamera = async () => {
+        const permissionResult =
+            await ImagePicker.requestCameraPermissionsAsync();
+        if (!permissionResult.granted) {
             Alert.alert(
                 "Permission Required",
-                "You need to enable camera access in settings."
+                "You need to grant camera access to use this feature."
             );
             return;
         }
-        setCameraOpen(true);
-    };
 
-    // Capture Image from Camera
-    const takePicture = async () => {
-        if (cameraRef.current) {
-            const photo = await cameraRef.current.takePictureAsync({
-                quality: 1,
-                flashMode: "on",
-            });
-            setCameraOpen(false);
-            preprocessImage(photo.uri);
+        const result = await ImagePicker.launchCameraAsync({
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+            flashMode: "on",
+        });
+
+        if (!result.canceled) {
+            preprocessImage(result.assets[0].uri);
         }
     };
 
-    // Pick Image from Library
     const pickImageFromLibrary = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
             allowsEditing: true,
@@ -68,7 +53,6 @@ const CaptureScreen = ({ navigation }) => {
         }
     };
 
-    // Process Image Before Submission
     const preprocessImage = async (uri) => {
         try {
             const manipulatedImage = await ImageManipulator.manipulateAsync(
@@ -82,7 +66,6 @@ const CaptureScreen = ({ navigation }) => {
         }
     };
 
-    // Handle Image Submission
     const handleSubmit = async () => {
         const token = await AsyncStorage.getItem("authToken");
         if (!token) {
@@ -126,25 +109,25 @@ const CaptureScreen = ({ navigation }) => {
         <View style={styles.container}>
             <Text style={styles.header}>Capture Your Throat Image</Text>
 
-            {/* Instructions Card */}
+            {/* Instruction Card */}
             <View style={styles.instructionsContainer}>
                 <Text style={styles.instructionsTitle}>
                     📸 Image Guidelines:
                 </Text>
                 <Text style={styles.instructionsText}>
-                    ✔️ Use a **well-lit environment**.
+                    1. Use a well-lit environment.
                 </Text>
                 <Text style={styles.instructionsText}>
-                    ✔️ Hold the camera **close to your throat**.
+                    2. Hold the camera close to your throat.
                 </Text>
                 <Text style={styles.instructionsText}>
-                    ✔️ Say **"Ahhh"** to fully expose the throat.
+                    3. Say "Ahhh" to fully expose the throat.
                 </Text>
                 <Text style={styles.instructionsText}>
-                    ✔️ Ensure **tonsils are visible** in the frame.
+                    4. Avoid blocking the tonsils with your tongue.
                 </Text>
                 <Text style={styles.instructionsText}>
-                    ✔️ Keep the **flash on** for clarity.
+                    5. Keep the flash on for clarity.
                 </Text>
             </View>
 
@@ -155,7 +138,7 @@ const CaptureScreen = ({ navigation }) => {
                     onPress={openCamera}
                 >
                     <Ionicons name="camera" size={28} color="#fff" />
-                    <Text style={styles.buttonText}>Open Camera</Text>
+                    <Text style={styles.buttonText}>Capture Image</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -163,23 +146,12 @@ const CaptureScreen = ({ navigation }) => {
                     onPress={pickImageFromLibrary}
                 >
                     <Ionicons name="image" size={28} color="#fff" />
-                    <Text style={styles.buttonText}>Upload Image</Text>
+                    <Text style={styles.buttonText}>Upload from Device</Text>
                 </TouchableOpacity>
             </View>
 
-            {/* Image Preview & Retake Button */}
-            {image && (
-                <>
-                    <Image source={{ uri: image }} style={styles.preview} />
-                    <TouchableOpacity
-                        style={styles.retakeButton}
-                        onPress={() => setImage(null)}
-                    >
-                        <Ionicons name="refresh" size={28} color="#fff" />
-                        <Text style={styles.buttonText}>Retake Image</Text>
-                    </TouchableOpacity>
-                </>
-            )}
+            {/* Image Preview */}
+            {image && <Image source={{ uri: image }} style={styles.preview} />}
 
             {/* Submit Button */}
             {image && (
@@ -194,32 +166,96 @@ const CaptureScreen = ({ navigation }) => {
             )}
 
             {loading && <ActivityIndicator size="large" color="#007AFF" />}
-
-            {/* Camera Modal */}
-            {cameraOpen && (
-                <Modal
-                    animationType="slide"
-                    transparent={false}
-                    visible={cameraOpen}
-                >
-                    <Camera style={styles.camera} ref={cameraRef}>
-                        <View style={styles.overlay}>
-                            <Text style={styles.overlayText}>
-                                Position your throat inside the frame & say
-                                "Ahhh"
-                            </Text>
-                        </View>
-                        <TouchableOpacity
-                            style={styles.captureButton}
-                            onPress={takePicture}
-                        >
-                            <Ionicons name="camera" size={40} color="#fff" />
-                        </TouchableOpacity>
-                    </Camera>
-                </Modal>
-            )}
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#f8f9fa",
+        padding: 20,
+    },
+    header: {
+        fontSize: 22,
+        fontWeight: "bold",
+        textAlign: "center",
+        color: "#007AFF",
+        marginBottom: 15,
+    },
+    instructionsContainer: {
+        backgroundColor: "#fff",
+        padding: 15,
+        borderRadius: 10,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 2,
+        marginBottom: 20,
+        width: "100%",
+    },
+    instructionsTitle: {
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "#333",
+        marginBottom: 10,
+    },
+    instructionsText: {
+        fontSize: 16,
+        color: "#555",
+        marginBottom: 5,
+    },
+    buttonRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        width: "100%",
+    },
+    captureButton: {
+        flex: 1,
+        backgroundColor: "#007AFF",
+        paddingVertical: 12,
+        borderRadius: 10,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        marginRight: 5,
+    },
+    uploadButton: {
+        flex: 1,
+        backgroundColor: "#007AFF",
+        paddingVertical: 12,
+        borderRadius: 10,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        marginLeft: 5,
+    },
+    submitButton: {
+        backgroundColor: "#007AFF",
+        paddingVertical: 14,
+        borderRadius: 10,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+    },
+    buttonText: {
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "#fff",
+        marginLeft: 8,
+    },
+    preview: {
+        width: 300,
+        height: 300,
+        marginVertical: 10,
+        borderRadius: 10,
+        borderWidth: 2,
+        borderColor: "#ddd",
+    },
+});
 
 export default CaptureScreen;
