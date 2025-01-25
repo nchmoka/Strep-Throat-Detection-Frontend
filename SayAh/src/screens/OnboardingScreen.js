@@ -14,7 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const OnboardingScreen = ({ navigation }) => {
     const finishOnboarding = async () => {
         try {
-            await AsyncStorage.setItem("hasSeenOnboarding", "false");
+            await AsyncStorage.setItem("hasSeenOnboarding", "true");
             navigation.replace("Auth");
         } catch (error) {
             console.error("Error saving onboarding status:", error);
