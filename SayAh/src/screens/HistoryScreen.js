@@ -53,7 +53,7 @@ const HistoryScreen = ({ navigation }) => {
             )}
             <Button
                 title="Back to Home"
-                onPress={() => navigation.navigate("CaptureScreen")}
+                onPress={() => navigation.navigate("Capture")}
             />
         </View>
     );

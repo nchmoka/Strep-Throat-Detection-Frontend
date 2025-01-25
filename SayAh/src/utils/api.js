@@ -1,11 +1,18 @@
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const BASE_URL =
-    "https://a337-2a06-c701-74df-e00-5495-e6f9-b7d5-a356.ngrok-free.app";
+    "https://7bcf-2a06-c701-74df-e00-5d73-8f54-5cbe-d2ea.ngrok-free.app";
 
 // Function to upload image to the backend
 export const uploadImage = async (imageUri) => {
     try {
+        const authToken = await AsyncStorage.getItem("authToken"); // Retrieve stored session ID
+
+        if (!authToken) {
+            throw new Error("User not authenticated");
+        }
+
         const formData = new FormData();
         formData.append("image", {
             uri: imageUri,
@@ -16,8 +23,9 @@ export const uploadImage = async (imageUri) => {
         const response = await axios.post(`${BASE_URL}/analyze/`, formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
+                Cookie: `sessionid=${authToken}`, // Attach session ID
             },
-            withCredentials: true, // To include cookies in the request
+            withCredentials: true,
         });
 
         return response.data;
@@ -27,6 +35,7 @@ export const uploadImage = async (imageUri) => {
     }
 };
 
+// Function to register a user without auto-login
 export const registerUser = async (username, password, navigation) => {
     try {
         const response = await axios.post(
@@ -42,20 +51,11 @@ export const registerUser = async (username, password, navigation) => {
             }
         );
 
-        if (response.status === 201) {
-            alert("Registration successful! Logging in...");
-
-            // Auto-login after successful registration
-            const loginResponse = await loginUser(username, password);
-
-            if (loginResponse.success) {
-                alert("Login successful!");
-                navigation.replace("HomeScreen"); // Redirect user to main app screen
-            } else {
-                alert("Login failed! Please log in manually.");
-                navigation.navigate("LoginScreen"); // Redirect to login screen
-            }
+        if (response.message === "User registered successfully") {
+            alert("Registration successful! Please log in.");
+            navigation.navigate("LoginScreen"); // Redirect to login screen
         }
+
         return response.data;
     } catch (error) {
         console.error("Error registering user:", error);
@@ -80,9 +80,69 @@ export const loginUser = async (username, password) => {
                 withCredentials: true, // To include session cookies
             }
         );
-        return response.data;
+
+        if (response.status === 200) {
+            console.log("Login Headers:", response.headers); // Debug headers
+
+            // Extract session ID from response headers
+            const setCookieHeader = response.headers["set-cookie"];
+            let sessionId = null;
+
+            if (setCookieHeader && Array.isArray(setCookieHeader)) {
+                console.log("Set-Cookie Header:", setCookieHeader); // Debugging
+
+                // Join array into a single string, then split cookies by ", " (for multiple cookies)
+                const cookieString = setCookieHeader.join(", ");
+                console.log("Cookie String:", cookieString); // Debugging
+
+                // Find the sessionid in the cookie string
+                const sessionCookie = cookieString
+                    .split(", ") // Split cookies in case of multiple
+                    .find((cookie) => cookie.includes("sessionid="));
+
+                console.log("Session Cookie Found:", sessionCookie); // Debugging
+
+                if (sessionCookie) {
+                    sessionId = sessionCookie.split(";")[0].split("=")[1]; // Extract session ID
+                    console.log("Extracted Session ID:", sessionId); // Debugging
+                }
+            }
+
+            if (!sessionId) {
+                console.error("Session ID not found in headers.");
+                return { success: false, error: "Session ID missing." };
+            }
+
+            await AsyncStorage.setItem("authToken", sessionId); // Store session ID
+            console.log("Stored session ID:", sessionId); // Debugging
+
+            return { success: true, sessionId };
+        }
+
+        return { success: false, error: "Login failed." };
     } catch (error) {
         console.error("Error logging in:", error);
         return { success: false, error: error.message };
+    }
+};
+
+// Function to check if the user is logged in
+export const checkLoginStatus = async () => {
+    try {
+        const token = await AsyncStorage.getItem("authToken");
+        return token ? true : false;
+    } catch (error) {
+        console.error("Error checking login status:", error);
+        return false;
+    }
+};
+
+// Function to log out a user
+export const logoutUser = async (navigation) => {
+    try {
+        await AsyncStorage.removeItem("authToken"); // Remove saved session
+        navigation.replace("LoginScreen"); // Redirect to login
+    } catch (error) {
+        console.error("Error logging out:", error);
     }
 };

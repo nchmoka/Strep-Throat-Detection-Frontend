@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Switch, StyleSheet } from "react-native";
+import { View, Text, Switch, StyleSheet, Button, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { CommonActions } from "@react-navigation/native";
 
-const SettingsScreen = () => {
-    const [darkMode, setDarkMode] = useState(false);
+const SettingsScreen = ({ navigation }) => {
     const [notifications, setNotifications] = useState(true);
 
     useEffect(() => {
@@ -12,11 +12,9 @@ const SettingsScreen = () => {
 
     const loadSettings = async () => {
         try {
-            const darkModeValue = await AsyncStorage.getItem("darkMode");
             const notificationsValue = await AsyncStorage.getItem(
                 "notifications"
             );
-            if (darkModeValue !== null) setDarkMode(JSON.parse(darkModeValue));
             if (notificationsValue !== null)
                 setNotifications(JSON.parse(notificationsValue));
         } catch (error) {
@@ -32,29 +30,27 @@ const SettingsScreen = () => {
         }
     };
 
+    const handleLogout = async () => {
+        try {
+            await AsyncStorage.removeItem("authToken"); // Clear stored session
+            Alert.alert("Logged Out", "You have been logged out successfully.");
+            navigation.dispatch(
+                CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: "Auth" }], // Redirects to Login/Register
+                })
+            );
+        } catch (error) {
+            console.error("Error logging out:", error);
+        }
+    };
+
     return (
-        <View style={[styles.container, darkMode && styles.darkContainer]}>
-            <Text style={[styles.header, darkMode && styles.darkText]}>
-                Settings
-            </Text>
+        <View style={styles.container}>
+            <Text style={styles.header}>Settings</Text>
 
             <View style={styles.settingItem}>
-                <Text style={[styles.settingText, darkMode && styles.darkText]}>
-                    Dark Mode
-                </Text>
-                <Switch
-                    value={darkMode}
-                    onValueChange={(value) => {
-                        setDarkMode(value);
-                        saveSetting("darkMode", value);
-                    }}
-                />
-            </View>
-
-            <View style={styles.settingItem}>
-                <Text style={[styles.settingText, darkMode && styles.darkText]}>
-                    Notifications
-                </Text>
+                <Text style={styles.settingText}>Notifications</Text>
                 <Switch
                     value={notifications}
                     onValueChange={(value) => {
@@ -63,6 +59,8 @@ const SettingsScreen = () => {
                     }}
                 />
             </View>
+
+            <Button title="Logout" onPress={handleLogout} color="#d9534f" />
         </View>
     );
 };
@@ -73,17 +71,11 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: "#f8f9fa",
     },
-    darkContainer: {
-        backgroundColor: "#121212",
-    },
     header: {
         fontSize: 24,
         fontWeight: "bold",
         marginBottom: 20,
         textAlign: "center",
-    },
-    darkText: {
-        color: "#ffffff",
     },
     settingItem: {
         flexDirection: "row",

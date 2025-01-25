@@ -9,8 +9,18 @@ import {
     Image,
 } from "react-native";
 import Swiper from "react-native-swiper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const OnboardingScreen = ({ navigation }) => {
+    const finishOnboarding = async () => {
+        try {
+            await AsyncStorage.setItem("hasSeenOnboarding", "false");
+            navigation.replace("Auth");
+        } catch (error) {
+            console.error("Error saving onboarding status:", error);
+        }
+    };
+
     const fadeAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
@@ -70,7 +80,7 @@ const OnboardingScreen = ({ navigation }) => {
                     </Text>
                     <Button
                         title="Get Started"
-                        onPress={() => navigation.replace("LoginScreen")}
+                        onPress={() => finishOnboarding()}
                         color="#007AFF"
                     />
                 </View>
@@ -82,7 +92,7 @@ const OnboardingScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#f8f9fa",
+        backgroundColor: "#FFFFFF",
     },
     slide: {
         flex: 1,

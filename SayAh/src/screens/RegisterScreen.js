@@ -15,7 +15,7 @@ const RegisterScreen = ({ navigation }) => {
         const response = await registerUser(username, password);
         if (response.message === "User registered successfully") {
             Alert.alert("Success", "Registration successful! Please log in.");
-            navigation.navigate("LoginScreen");
+            navigation.navigate("Login"); // Redirect to login
         } else {
             Alert.alert("Error", response.error || "Registration failed.");
         }
@@ -40,7 +40,7 @@ const RegisterScreen = ({ navigation }) => {
             <Button title="Register" onPress={handleRegister} />
             <Text
                 style={styles.switchText}
-                onPress={() => navigation.navigate("LoginScreen")}
+                onPress={() => navigation.navigate("Login")}
             >
                 Already have an account? Log in
             </Text>
