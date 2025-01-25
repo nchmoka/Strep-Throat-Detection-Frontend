@@ -8,8 +8,6 @@ const LoginScreen = ({ navigation }) => {
     const [password, setPassword] = useState("");
 
     const handleLogin = async () => {
-        // AsyncStorage.clear();
-        // console.log("async storage cleared");
         if (!username || !password) {
             Alert.alert("Error", "Please enter both username and password.");
             return;
