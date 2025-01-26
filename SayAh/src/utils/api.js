@@ -35,31 +35,42 @@ export const uploadImage = async (imageUri) => {
     }
 };
 
-// Function to register a user without auto-login
-export const registerUser = async (username, password, navigation) => {
+// Function to fetch the history of user diagnoses
+export const fetchHistory = async () => {
     try {
-        const response = await axios.post(
-            `${BASE_URL}/register/`,
-            new URLSearchParams({
-                username,
-                password,
-            }),
-            {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-            }
-        );
-
-        if (response.message === "User registered successfully") {
-            alert("Registration successful! Please log in.");
-            navigation.navigate("LoginScreen"); // Redirect to login screen
+        const authToken = await AsyncStorage.getItem("authToken");
+        if (!authToken) {
+            throw new Error("User not authenticated");
         }
+
+        const response = await axios.get(`${BASE_URL}/analysis/history/`, {
+            headers: { Cookie: `sessionid=${authToken}` },
+            withCredentials: true,
+        });
 
         return response.data;
     } catch (error) {
+        console.error("Error fetching history:", error);
+        return [];
+    }
+};
+
+// Function to register a user without auto-login
+export const registerUser = async (username, password) => {
+    try {
+        const response = await axios.post(
+            `${BASE_URL}/register/`,
+            new URLSearchParams({ username, password }),
+            { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+        );
+
+        if (response.status === 201) {
+            return { success: true, message: "User registered successfully" };
+        } else {
+            return { success: false, error: "Registration failed." };
+        }
+    } catch (error) {
         console.error("Error registering user:", error);
-        alert("Registration failed. Please try again.");
         return { success: false, error: error.message };
     }
 };
