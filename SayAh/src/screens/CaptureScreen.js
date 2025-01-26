@@ -243,14 +243,14 @@ const styles = StyleSheet.create({
         width: "100%",
     },
     buttonText: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: "bold",
         color: "#fff",
         marginLeft: 8,
     },
     preview: {
-        width: 300,
-        height: 300,
+        width: 250,
+        height: 250,
         marginVertical: 10,
         borderRadius: 10,
         borderWidth: 2,
