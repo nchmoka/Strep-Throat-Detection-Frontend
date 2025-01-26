@@ -4,7 +4,14 @@ import { Ionicons } from "@expo/vector-icons";
 
 const ResultScreen = ({ route, navigation }) => {
     const result = route.params?.result || {}; // Handle missing result safely
-    const isStrep = result.prediction === "strep"; // Determine if user has strep
+    var isStrep = result.prediction === "strep"; // Determine if user has strep
+    // check if there is field called label in result object
+    // if yes, check if the value is equal to "strep"
+    if (result.label === "strep") {
+        isStrep = true;
+    }
+
+    console.log(result);
 
     const handleMedicalHelp = () => {
         Alert.alert(
@@ -76,7 +83,7 @@ const ResultScreen = ({ route, navigation }) => {
                     }
                 >
                     <Ionicons name="camera-outline" size={24} color="#fff" />
-                    <Text style={styles.buttonText}>Take Another Test</Text>
+                    <Text style={styles.buttonText}>Back to home</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
