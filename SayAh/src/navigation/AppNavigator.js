@@ -20,90 +20,83 @@ const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
 // Bottom Tabs for Main App
-const MainTabs = () => {
-    return (
-        <Tab.Navigator screenOptions={{ headerShown: false }}>
-            <Tab.Screen
-                name="Capture"
-                component={CaptureScreen}
-                options={{
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="camera" color={color} size={size} />
-                    ),
-                }}
-            />
-            <Tab.Screen
-                name="History"
-                component={HistoryScreen}
-                options={{
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="time" color={color} size={size} />
-                    ),
-                }}
-            />
-        </Tab.Navigator>
-    );
-};
+const MainTabs = () => (
+    <Tab.Navigator screenOptions={{ headerShown: false }}>
+        <Tab.Screen
+            name="Capture"
+            component={CaptureScreen}
+            options={{
+                tabBarIcon: ({ color, size }) => (
+                    <Ionicons name="camera" color={color} size={size} />
+                ),
+            }}
+        />
+        <Tab.Screen
+            name="History"
+            component={HistoryScreen}
+            options={{
+                tabBarIcon: ({ color, size }) => (
+                    <Ionicons name="time" color={color} size={size} />
+                ),
+            }}
+        />
+    </Tab.Navigator>
+);
 
 // Main Stack (Tabs + Additional Screens)
-const MainStack = () => {
-    return (
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="MainTabs" component={MainTabs} />
-            <Stack.Screen name="Result" component={ResultScreen} />
-        </Stack.Navigator>
-    );
-};
+const MainStack = () => (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="MainTabs" component={MainTabs} />
+        <Stack.Screen name="Result" component={ResultScreen} />
+    </Stack.Navigator>
+);
 
 // Drawer Navigation for Additional Screens
-const DrawerNavigator = () => {
-    return (
-        <Drawer.Navigator>
-            <Drawer.Screen name="Home" component={MainStack} />
-            <Drawer.Screen name="FAQ" component={FAQScreen} />
-            <Drawer.Screen name="Learning" component={LearningScreen} />
-            <Drawer.Screen name="Settings" component={SettingsScreen} />
-        </Drawer.Navigator>
-    );
-};
+const DrawerNavigator = () => (
+    <Drawer.Navigator>
+        <Drawer.Screen name="Home" component={MainStack} />
+        <Drawer.Screen name="FAQ" component={FAQScreen} />
+        <Drawer.Screen name="Learning" component={LearningScreen} />
+        <Drawer.Screen name="Settings" component={SettingsScreen} />
+    </Drawer.Navigator>
+);
 
 // Authentication Flow (Login & Register)
-const AuthStack = () => {
-    return (
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
-        </Stack.Navigator>
-    );
-};
+const AuthStack = () => (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
+    </Stack.Navigator>
+);
 
 // Root Navigation
 const AppNavigator = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(null);
     const [hasSeenOnboarding, setHasSeenOnboarding] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const checkLogin = async () => {
-            const token = await AsyncStorage.getItem("authToken");
+        const checkOnboardingStatus = async () => {
             const onboardingStatus = await AsyncStorage.getItem(
                 "hasSeenOnboarding"
             );
-
-            setIsLoggedIn(!!token);
             setHasSeenOnboarding(onboardingStatus === "true");
             setLoading(false);
         };
 
-        checkLogin();
+        checkOnboardingStatus();
     }, []);
 
-    if (loading) return null;
+    if (loading) return null; // Prevent UI flickering
 
     return (
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+                {!hasSeenOnboarding && (
+                    <Stack.Screen
+                        name="Onboarding"
+                        component={OnboardingScreen}
+                    />
+                )}
                 <Stack.Screen name="Auth" component={AuthStack} />
                 <Stack.Screen name="Main" component={DrawerNavigator} />
             </Stack.Navigator>
