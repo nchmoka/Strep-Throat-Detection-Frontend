@@ -34,7 +34,7 @@ const LoginScreen = ({ navigation }) => {
                 );
             }
         } else {
-            Alert.alert("Error", "Login failed. wrong credentials");
+            Alert.alert("Error", response.error || "Login failed.");
         }
     };
     return (
