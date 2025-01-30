@@ -127,17 +127,6 @@ export const loginUser = async (username, password) => {
     }
 };
 
-// Function to check if the user is logged in
-export const checkLoginStatus = async () => {
-    try {
-        const token = await AsyncStorage.getItem("authToken");
-        return token ? true : false;
-    } catch (error) {
-        console.error("Error checking login status:", error);
-        return false;
-    }
-};
-
 // Function to log out a user
 export const logoutUser = async (navigation) => {
     try {
