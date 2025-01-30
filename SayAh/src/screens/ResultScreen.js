@@ -1,18 +1,32 @@
+// Import necessary dependencies
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons"; // For UI icons
 
+/**
+ * ResultScreen Component
+ * Displays the diagnostic results for strep throat analysis
+ * Shows probability, recommendations, and navigation options
+ * @param {object} route - Contains navigation parameters including test results
+ * @param {object} navigation - React Navigation prop for screen navigation
+ */
 const ResultScreen = ({ route, navigation }) => {
-    const result = route.params?.result || {}; // Handle missing result safely
-    var isStrep = result.prediction === "strep"; // Determine if user has strep
-    // check if there is field called label in result object
-    // if yes, check if the value is equal to "strep"
+    // Safely extract result from navigation params
+    const result = route.params?.result || {};
+
+    // Determine if the result indicates strep throat
+    var isStrep = result.prediction === "strep";
+    // Additional check for historical results which use 'label' instead of 'prediction'
     if (result.label === "strep") {
         isStrep = true;
     }
 
     console.log(result);
 
+    /**
+     * Handles the medical help button press
+     * Shows alert with recommendation to seek professional help
+     */
     const handleMedicalHelp = () => {
         Alert.alert(
             "Seek Medical Help",
@@ -23,11 +37,15 @@ const ResultScreen = ({ route, navigation }) => {
 
     return (
         <View style={styles.container}>
+            {/* Screen header */}
             <Text style={styles.header}>🩺 Diagnostic Result</Text>
 
+            {/* Results card */}
             <View style={styles.resultCard}>
+                {/* Conditional rendering based on result availability */}
                 {result.probability !== undefined ? (
                     <>
+                        {/* Probability display */}
                         <Text style={styles.resultText}>
                             Probability of Strep Throat:{" "}
                             <Text
@@ -40,6 +58,7 @@ const ResultScreen = ({ route, navigation }) => {
                             </Text>
                         </Text>
 
+                        {/* Recommendation message */}
                         <Text
                             style={[
                                 styles.suggestion,
@@ -51,6 +70,7 @@ const ResultScreen = ({ route, navigation }) => {
                                 : "✅ You are in the clear! No signs of strep throat detected."}
                         </Text>
 
+                        {/* Conditional medical help button for positive results */}
                         {isStrep && (
                             <TouchableOpacity
                                 style={styles.helpButton}
@@ -68,14 +88,16 @@ const ResultScreen = ({ route, navigation }) => {
                         )}
                     </>
                 ) : (
+                    // Error message when no result data is available
                     <Text style={styles.errorText}>
                         ❌ No result data available.
                     </Text>
                 )}
             </View>
 
-            {/* Action Buttons */}
+            {/* Navigation buttons */}
             <View style={styles.buttonContainer}>
+                {/* Return to capture screen button */}
                 <TouchableOpacity
                     style={styles.actionButton}
                     onPress={() =>
@@ -86,6 +108,7 @@ const ResultScreen = ({ route, navigation }) => {
                     <Text style={styles.buttonText}>Back to home</Text>
                 </TouchableOpacity>
 
+                {/* View history button */}
                 <TouchableOpacity
                     style={styles.actionButton}
                     onPress={() =>
@@ -100,6 +123,7 @@ const ResultScreen = ({ route, navigation }) => {
     );
 };
 
+// Styles for the component
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -120,11 +144,12 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         width: "100%",
         alignItems: "center",
+        // Card shadow styling
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        elevation: 4,
+        elevation: 4, // Android shadow
     },
     resultText: {
         fontSize: 18,
@@ -138,11 +163,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     strepText: {
-        color: "#d9534f",
+        color: "#d9534f", // Red for positive strep results
         fontWeight: "bold",
     },
     healthyText: {
-        color: "#28a745",
+        color: "#28a745", // Green for negative results
         fontWeight: "bold",
     },
     errorText: {
@@ -154,7 +179,7 @@ const styles = StyleSheet.create({
     helpButton: {
         flexDirection: "row",
         alignItems: "center",
-        backgroundColor: "#d9534f",
+        backgroundColor: "#d9534f", // Red background for urgency
         paddingVertical: 12,
         paddingHorizontal: 20,
         borderRadius: 10,

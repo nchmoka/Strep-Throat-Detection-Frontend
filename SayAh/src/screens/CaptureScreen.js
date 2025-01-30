@@ -1,3 +1,4 @@
+// Import necessary dependencies from React and React Native
 import React, { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -9,15 +10,26 @@ import {
     ActivityIndicator,
     Text,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import * as ImageManipulator from "expo-image-manipulator";
-import { uploadImage } from "../utils/api";
-import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker"; // For camera and image library access
+import * as ImageManipulator from "expo-image-manipulator"; // For image processing
+import { uploadImage } from "../utils/api"; // Custom API utility for image upload
+import { Ionicons } from "@expo/vector-icons"; // For UI icons
 
+/**
+ * CaptureScreen Component
+ * Allows users to capture or upload throat images for analysis
+ * Includes image preprocessing, upload functionality, and user instructions
+ * @param {object} navigation - React Navigation prop for screen navigation
+ */
 const CaptureScreen = ({ navigation }) => {
+    // State management for image URI and loading status
     const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    /**
+     * Opens device camera and handles image capture
+     * Requests camera permissions if not already granted
+     */
     const openCamera = async () => {
         const permissionResult =
             await ImagePicker.requestCameraPermissionsAsync();
@@ -33,7 +45,7 @@ const CaptureScreen = ({ navigation }) => {
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
-            flashMode: "on",
+            flashMode: "on", // Force flash for better throat visibility
         });
 
         if (!result.canceled) {
@@ -41,6 +53,9 @@ const CaptureScreen = ({ navigation }) => {
         }
     };
 
+    /**
+     * Opens device image library for selecting existing images
+     */
     const pickImageFromLibrary = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
             allowsEditing: true,
@@ -53,11 +68,16 @@ const CaptureScreen = ({ navigation }) => {
         }
     };
 
+    /**
+     * Preprocesses the image before upload
+     * Resizes and compresses the image for optimal upload and analysis
+     * @param {string} uri - The URI of the captured/selected image
+     */
     const preprocessImage = async (uri) => {
         try {
             const manipulatedImage = await ImageManipulator.manipulateAsync(
                 uri,
-                [{ resize: { width: 500 } }],
+                [{ resize: { width: 500 } }], // Resize to standard width
                 { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG }
             );
             setImage(manipulatedImage.uri);
@@ -66,7 +86,12 @@ const CaptureScreen = ({ navigation }) => {
         }
     };
 
+    /**
+     * Handles image submission for analysis
+     * Checks for authentication and valid image before upload
+     */
     const handleSubmit = async () => {
+        // Check for authentication
         const token = await AsyncStorage.getItem("authToken");
         if (!token) {
             Alert.alert(
@@ -80,11 +105,13 @@ const CaptureScreen = ({ navigation }) => {
             return;
         }
 
+        // Validate image existence
         if (!image) {
             Alert.alert("No Image", "Please capture or upload an image first.");
             return;
         }
 
+        // Handle upload process
         setLoading(true);
         try {
             const response = await uploadImage(image);
@@ -109,7 +136,7 @@ const CaptureScreen = ({ navigation }) => {
         <View style={styles.container}>
             <Text style={styles.header}>Capture Your Throat Image</Text>
 
-            {/* Instruction Card */}
+            {/* Instructions card for proper image capture */}
             <View style={styles.instructionsContainer}>
                 <Text style={styles.instructionsTitle}>
                     📸 Image Guidelines:
@@ -131,7 +158,7 @@ const CaptureScreen = ({ navigation }) => {
                 </Text>
             </View>
 
-            {/* Capture & Upload Buttons */}
+            {/* Image capture and upload buttons */}
             <View style={styles.buttonRow}>
                 <TouchableOpacity
                     style={styles.captureButton}
@@ -150,10 +177,10 @@ const CaptureScreen = ({ navigation }) => {
                 </TouchableOpacity>
             </View>
 
-            {/* Image Preview */}
+            {/* Image preview section */}
             {image && <Image source={{ uri: image }} style={styles.preview} />}
 
-            {/* Submit Button */}
+            {/* Submit button - only shown when image is selected */}
             {image && (
                 <TouchableOpacity
                     style={styles.submitButton}
@@ -165,11 +192,13 @@ const CaptureScreen = ({ navigation }) => {
                 </TouchableOpacity>
             )}
 
+            {/* Loading indicator */}
             {loading && <ActivityIndicator size="large" color="#007AFF" />}
         </View>
     );
 };
 
+// Styles for the component
 const styles = StyleSheet.create({
     container: {
         flex: 1,

@@ -1,12 +1,21 @@
+// Import necessary dependencies from React and React Native
 import React from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 
+/**
+ * LearningScreen Component
+ * Educational screen that provides comprehensive information about strep throat
+ * Includes sections on symptoms, diagnosis, treatment, and prevention
+ * Content is organized in a scrollable format with clear visual hierarchy
+ */
 const LearningScreen = () => {
     return (
+        // ScrollView enables scrolling through the extensive content
         <ScrollView style={styles.container}>
+            {/* Main title of the educational content */}
             <Text style={styles.header}>Understanding Strep Throat</Text>
 
-            {/* Section: What is Strep Throat */}
+            {/* Definition Section */}
             <Text style={styles.subHeader}>📌 What is Strep Throat?</Text>
             <Text style={styles.text}>
                 Strep throat is a bacterial infection caused by{" "}
@@ -23,13 +32,14 @@ const LearningScreen = () => {
                 touching contaminated surfaces.
             </Text>
 
-            {/* Section: Symptoms */}
+            {/* Symptoms Section */}
             <Text style={styles.subHeader}>🔍 Symptoms of Strep Throat</Text>
             <Text style={styles.text}>
                 Strep throat symptoms usually appear{" "}
                 <Text style={styles.bold}>within 2 to 5 days</Text> after
                 exposure. Common symptoms include:
             </Text>
+            {/* Bulleted list of symptoms */}
             <View style={styles.bulletList}>
                 <Text style={styles.bulletItem}>
                     • Sudden and severe sore throat
@@ -52,7 +62,7 @@ const LearningScreen = () => {
                 </Text>
             </View>
 
-            {/* Section: Diagnosis */}
+            {/* Diagnosis Section */}
             <Text style={styles.subHeader}>🩺 Diagnosis of Strep Throat</Text>
             <Text style={styles.text}>
                 A doctor can diagnose strep throat using:
@@ -68,7 +78,7 @@ const LearningScreen = () => {
                 </Text>
             </View>
 
-            {/* Section: Treatment */}
+            {/* Treatment Section */}
             <Text style={styles.subHeader}>💊 Treatment for Strep Throat</Text>
             <Text style={styles.text}>
                 Since strep throat is caused by{" "}
@@ -99,7 +109,7 @@ const LearningScreen = () => {
                 <Text style={styles.bold}>kidney inflammation</Text>.
             </Text>
 
-            {/* Section: Home Remedies */}
+            {/* Home Care Section */}
             <Text style={styles.subHeader}>
                 🏠 Home Care and Symptom Relief
             </Text>
@@ -127,7 +137,7 @@ const LearningScreen = () => {
                 </Text>
             </View>
 
-            {/* Section: Prevention */}
+            {/* Prevention Section */}
             <Text style={styles.subHeader}>🛡️ How to Prevent Strep Throat</Text>
             <Text style={styles.text}>
                 Strep throat is contagious, but you can reduce the risk by
@@ -153,7 +163,7 @@ const LearningScreen = () => {
                 </Text>
             </View>
 
-            {/* Final Message */}
+            {/* Concluding message */}
             <Text style={styles.footer}>
                 If you suspect <Text style={styles.bold}>strep throat</Text>,
                 seek medical attention for diagnosis and treatment. Proper care
@@ -164,30 +174,31 @@ const LearningScreen = () => {
     );
 };
 
+// Styles for the component
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: "#f8f9fa",
+        backgroundColor: "#f8f9fa", // Light background for better readability
     },
     header: {
         fontSize: 26,
         fontWeight: "bold",
         textAlign: "center",
         marginBottom: 20,
-        color: "#007AFF",
+        color: "#007AFF", // Blue color for main header
     },
     subHeader: {
         fontSize: 20,
         fontWeight: "bold",
         marginBottom: 10,
-        color: "#333",
+        color: "#333", // Dark gray for section headers
     },
     text: {
         fontSize: 16,
         marginBottom: 15,
-        lineHeight: 24,
-        color: "#555",
+        lineHeight: 24, // Improved readability for body text
+        color: "#555", // Medium gray for regular text
     },
     bulletList: {
         marginLeft: 10,
@@ -196,17 +207,17 @@ const styles = StyleSheet.create({
     bulletItem: {
         fontSize: 16,
         lineHeight: 24,
-        color: "#444",
+        color: "#444", // Slightly darker gray for list items
     },
     footer: {
         fontSize: 18,
         fontWeight: "bold",
         textAlign: "center",
         marginTop: 20,
-        color: "#28a745",
+        color: "#28a745", // Green color for emphasis
     },
     bold: {
-        fontWeight: "bold",
+        fontWeight: "bold", // Highlighting important terms
     },
 });
 

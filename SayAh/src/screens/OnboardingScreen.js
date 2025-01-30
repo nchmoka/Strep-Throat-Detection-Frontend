@@ -1,3 +1,4 @@
+// Import necessary dependencies
 import React, { useRef, useEffect, useState } from "react";
 import {
     View,
@@ -8,13 +9,25 @@ import {
     Image,
     ActivityIndicator,
 } from "react-native";
-import Swiper from "react-native-swiper";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import Swiper from "react-native-swiper"; // For swipeable onboarding slides
+import AsyncStorage from "@react-native-async-storage/async-storage"; // For persistent storage
 
+/**
+ * OnboardingScreen Component
+ * Displays app introduction slides with animations
+ * Handles first-time user experience and navigation flow
+ * @param {object} navigation - React Navigation prop for screen navigation
+ */
 const OnboardingScreen = ({ navigation }) => {
+    // State for loading indicator
     const [loading, setLoading] = useState(true);
+    // Animation value for fade-in effect
     const fadeAnim = useRef(new Animated.Value(0)).current;
 
+    /**
+     * Check if user has already seen onboarding
+     * Skip to Auth screen if onboarding was previously completed
+     */
     useEffect(() => {
         const checkOnboardingStatus = async () => {
             try {
@@ -24,6 +37,7 @@ const OnboardingScreen = ({ navigation }) => {
                 if (hasSeenOnboarding === "true") {
                     navigation.replace("Auth"); // Skip onboarding if already seen
                 } else {
+                    // Show onboarding with fade-in animation
                     setLoading(false);
                     Animated.timing(fadeAnim, {
                         toValue: 1,
@@ -40,6 +54,10 @@ const OnboardingScreen = ({ navigation }) => {
         checkOnboardingStatus();
     }, [navigation]);
 
+    /**
+     * Marks onboarding as completed and navigates to Auth screen
+     * Called when user completes the onboarding flow
+     */
     const finishOnboarding = async () => {
         try {
             await AsyncStorage.setItem("hasSeenOnboarding", "true");
@@ -49,6 +67,7 @@ const OnboardingScreen = ({ navigation }) => {
         }
     };
 
+    // Show loading indicator while checking onboarding status
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
@@ -58,13 +77,16 @@ const OnboardingScreen = ({ navigation }) => {
     }
 
     return (
+        // Animated container for fade-in effect
         <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+            {/* Swipeable slides container */}
             <Swiper
                 loop={false}
                 showsPagination
                 dotColor="#ccc"
                 activeDotColor="#007AFF"
             >
+                {/* Welcome Slide */}
                 <View style={styles.slide}>
                     <Image
                         source={require("../../assets/images/onboarding1.png")}
@@ -76,6 +98,8 @@ const OnboardingScreen = ({ navigation }) => {
                         strep throat infections using your phone's camera.
                     </Text>
                 </View>
+
+                {/* How It Works Slide */}
                 <View style={styles.slide}>
                     <Image
                         source={require("../../assets/images/onboarding2.png")}
@@ -92,6 +116,8 @@ const OnboardingScreen = ({ navigation }) => {
                         📊 Get instant results & recommendations
                     </Text>
                 </View>
+
+                {/* Medical Disclaimer Slide */}
                 <View style={styles.slide}>
                     <Image
                         source={require("../../assets/images/onboarding3.png")}
@@ -115,6 +141,7 @@ const OnboardingScreen = ({ navigation }) => {
     );
 };
 
+// Styles for the component
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -135,7 +162,7 @@ const styles = StyleSheet.create({
     image: {
         width: 300,
         height: 300,
-        resizeMode: "contain",
+        resizeMode: "contain", // Maintains aspect ratio
         marginBottom: 20,
     },
     header: {

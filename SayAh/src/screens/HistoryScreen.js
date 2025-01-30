@@ -1,3 +1,4 @@
+// Import necessary dependencies
 import React, { useEffect, useState } from "react";
 import {
     View,
@@ -8,17 +9,29 @@ import {
     StyleSheet,
     TouchableOpacity,
 } from "react-native";
-import { fetchHistory } from "../utils/api";
-import { Ionicons } from "@expo/vector-icons";
+import { fetchHistory } from "../utils/api"; // Custom API utility for fetching history
+import { Ionicons } from "@expo/vector-icons"; // For UI icons
 
+/**
+ * HistoryScreen Component
+ * Displays a list of past diagnoses with their results and timestamps
+ * Allows users to view detailed results by tapping on history items
+ * @param {object} navigation - React Navigation prop for screen navigation
+ */
 const HistoryScreen = ({ navigation }) => {
+    // State management for history data and loading status
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // Load history data when component mounts
     useEffect(() => {
         loadHistory();
     }, []);
 
+    /**
+     * Fetches history data from the API
+     * Handles loading states and error cases
+     */
     const loadHistory = async () => {
         setLoading(true);
         try {
@@ -34,6 +47,11 @@ const HistoryScreen = ({ navigation }) => {
         setLoading(false);
     };
 
+    /**
+     * Renders individual history item
+     * @param {object} item - History data item containing diagnosis details
+     * @returns {JSX.Element} Rendered history card
+     */
     const renderItem = ({ item }) => {
         const isStrep = item.label === "strep";
         return (
@@ -56,7 +74,7 @@ const HistoryScreen = ({ navigation }) => {
                         </Text>
                     </Text>
                     <Text style={styles.probability}>
-                        Probability for strep thraot:{" "}
+                        Probability for strep throat:{" "}
                         {Math.round(item.probability * 100)}%
                     </Text>
                     <Text style={styles.timestamp}>
@@ -76,6 +94,7 @@ const HistoryScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.header}>📜 Past Diagnoses</Text>
+            {/* Conditional rendering based on loading and data state */}
             {loading ? (
                 <ActivityIndicator size="large" color="#007AFF" />
             ) : history.length === 0 ? (
@@ -91,6 +110,7 @@ const HistoryScreen = ({ navigation }) => {
     );
 };
 
+// Styles for the component
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -118,19 +138,20 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
+        // Card shadow styling
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        elevation: 2,
+        elevation: 2, // Android shadow
     },
     strepCard: {
         borderLeftWidth: 5,
-        borderLeftColor: "#d9534f",
+        borderLeftColor: "#d9534f", // Red indicator for strep diagnosis
     },
     healthyCard: {
         borderLeftWidth: 5,
-        borderLeftColor: "#28a745",
+        borderLeftColor: "#28a745", // Green indicator for healthy diagnosis
     },
     details: {
         flex: 1,
@@ -141,18 +162,18 @@ const styles = StyleSheet.create({
     },
     probability: {
         fontSize: 16,
-        color: "#555",
+        color: "#555", // Medium gray for secondary text
     },
     timestamp: {
         fontSize: 14,
-        color: "#888",
+        color: "#888", // Light gray for tertiary text
     },
     strepText: {
-        color: "#d9534f",
+        color: "#d9534f", // Red text for strep diagnosis
         fontWeight: "bold",
     },
     healthyText: {
-        color: "#28a745",
+        color: "#28a745", // Green text for healthy diagnosis
         fontWeight: "bold",
     },
     icon: {
