@@ -1,28 +1,34 @@
 {
-    "expo": {
-        "name": "SayAh",
-        "slug": "SayAh",
-        "version": "1.0.0",
-        "orientation": "portrait",
-        "icon": "./assets/images/onboarding1.png",
-        "userInterfaceStyle": "light",
-        "newArchEnabled": true,
-        "splash": {
-            "image": "./assets/splash-icon.png",
-            "resizeMode": "contain",
-            "backgroundColor": "#ffffff"
-        },
-        "ios": {
-            "supportsTablet": true
-        },
-        "android": {
-            "adaptiveIcon": {
-                "foregroundImage": "./assets/images/onboarding1.png",
-                "backgroundColor": "#ffffff"
-            }
-        },
-        "web": {
-            "favicon": "./assets/images/onboarding1.png"
-        }
+  "expo": {
+    "name": "SayAh",
+    "slug": "SayAh",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/onboarding1.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/onboarding1.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.braudeprojectpartb.SayAh"
+    },
+    "web": {
+      "favicon": "./assets/images/onboarding1.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c8d0d54e-3e72-42d5-9495-84c5a0bd8d5a"
+      }
     }
+  }
 }
