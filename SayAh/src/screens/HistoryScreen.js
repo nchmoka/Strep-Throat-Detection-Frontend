@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons"; // For UI icons
 /**
  * HistoryScreen Component
  * Displays a list of past diagnoses with their results and timestamps
- * Allows users to view detailed results by tapping on history items
+ * Does not show the numeric probability percentage
  * @param {object} navigation - React Navigation prop for screen navigation
  */
 const HistoryScreen = ({ navigation }) => {
@@ -73,10 +73,7 @@ const HistoryScreen = ({ navigation }) => {
                             {item.label.toUpperCase()}
                         </Text>
                     </Text>
-                    <Text style={styles.probability}>
-                        Probability for strep throat:{" "}
-                        {Math.round(item.probability * 100)}%
-                    </Text>
+                    {/* Remove the line showing the numeric probability */}
                     <Text style={styles.timestamp}>
                         Date: {new Date(item.timestamp).toLocaleString()}
                     </Text>
@@ -160,13 +157,10 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "bold",
     },
-    probability: {
-        fontSize: 16,
-        color: "#555", // Medium gray for secondary text
-    },
     timestamp: {
         fontSize: 14,
         color: "#888", // Light gray for tertiary text
+        marginTop: 4,
     },
     strepText: {
         color: "#d9534f", // Red text for strep diagnosis

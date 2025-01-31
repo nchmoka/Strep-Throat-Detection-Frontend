@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons"; // For UI icons
 /**
  * ResultScreen Component
  * Displays the diagnostic results for strep throat analysis
- * Shows probability, recommendations, and navigation options
+ * Shows recommendation without revealing the exact probability
  * @param {object} route - Contains navigation parameters including test results
  * @param {object} navigation - React Navigation prop for screen navigation
  */
@@ -15,7 +15,7 @@ const ResultScreen = ({ route, navigation }) => {
     const result = route.params?.result || {};
 
     // Determine if the result indicates strep throat
-    var isStrep = result.prediction === "strep";
+    let isStrep = result.prediction === "strep";
     // Additional check for historical results which use 'label' instead of 'prediction'
     if (result.label === "strep") {
         isStrep = true;
@@ -45,18 +45,7 @@ const ResultScreen = ({ route, navigation }) => {
                 {/* Conditional rendering based on result availability */}
                 {result.probability !== undefined ? (
                     <>
-                        {/* Probability display */}
-                        <Text style={styles.resultText}>
-                            Probability of Strep Throat:{" "}
-                            <Text
-                                style={{
-                                    fontWeight: "bold",
-                                    color: isStrep ? "#d9534f" : "#28a745",
-                                }}
-                            >
-                                {Math.round(result.probability * 100)}%
-                            </Text>
-                        </Text>
+                        {/* Remove the probability display */}
 
                         {/* Recommendation message */}
                         <Text
@@ -150,11 +139,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 4, // Android shadow
-    },
-    resultText: {
-        fontSize: 18,
-        marginBottom: 10,
-        textAlign: "center",
     },
     suggestion: {
         fontSize: 16,
