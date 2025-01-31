@@ -25,17 +25,14 @@ const LoginScreen = ({ navigation }) => {
             Alert.alert("Error", "Please enter both username and password.");
             return;
         }
-
         // Attempt login through API
         const response = await loginUser(username, password);
-
         if (response.success) {
             try {
                 // Check for valid session ID
                 if (response.sessionId) {
                     // Store session ID in AsyncStorage for persistent auth
                     await AsyncStorage.setItem("authToken", response.sessionId);
-
                     // Reset navigation stack and redirect to main app
                     navigation.reset({
                         index: 0,

@@ -1,8 +1,7 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const BASE_URL =
-    "https://7bcf-2a06-c701-74df-e00-5d73-8f54-5cbe-d2ea.ngrok-free.app";
+const BASE_URL = "https://SayAh.pythonanywhere.com";
 
 // Function to upload image to the backend
 export const uploadImage = async (imageUri) => {
